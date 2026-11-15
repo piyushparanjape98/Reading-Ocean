@@ -30,3 +30,42 @@ button {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Invoice printing: the portal copy of the sheet is hidden on screen and is the only thing printed. */
+.print-only {
+  display: none;
+}
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+  html,
+  body {
+    min-height: 0 !important;
+    background: #fff !important;
+  }
+  body > *:not(.print-only) {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .print-only .invoice-sheet {
+    max-width: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+  .print-only,
+  .print-only * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .print-only table,
+  .print-only tr,
+  .print-only dl {
+    break-inside: avoid;
+  }
+}

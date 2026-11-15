@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Drawer, CoverArt, btnBrass, btnGhost, cx, money, ring } from './ui.jsx'
 import { useStore } from '../context/StoreContext.jsx'
@@ -14,34 +13,8 @@ function Stepper({ book, quantity, onChange }) {
   )
 }
 
-export default function CartDrawer({ onClose, onSelectBook, onViewOrders }) {
-  const { cart, cartCount, cartTotal, updateQuantity, removeFromCart, clearCart, addOrder } = useStore()
-  const [placed, setPlaced] = useState(null)
-
-  const checkout = () => {
-    // Demo checkout: records the order locally. No payment is taken.
-    setPlaced(addOrder({ items: cart }))
-    clearCart()
-  }
-
-  if (placed) {
-    return (
-      <Drawer onClose={onClose} label="Order placed" title="Order placed">
-        <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-          <p className="font-display text-[30px] leading-[34px] text-cream-100">Thank you.</p>
-          <p className="mt-2 font-sans text-[12px] leading-[18px] text-cream-400">
-            Order <span className="text-cream-200">{placed.id}</span> · {money(placed.total)}
-            <br />
-            This is a demo store, so nothing was charged or shipped.
-          </p>
-          <div className="mt-6 flex gap-2">
-            <button type="button" data-autofocus onClick={() => { onClose(); onViewOrders() }} className={cx(btnBrass, 'h-[36px] px-4', ring)}>View past orders</button>
-            <button type="button" onClick={onClose} className={cx(btnGhost, 'h-[36px] px-4', ring)}>Keep browsing</button>
-          </div>
-        </div>
-      </Drawer>
-    )
-  }
+export default function CartDrawer({ onClose, onSelectBook, onCheckout }) {
+  const { cart, cartCount, cartTotal, updateQuantity, removeFromCart, clearCart } = useStore()
 
   return (
     <Drawer onClose={onClose} label="Cart" title="Your cart">
@@ -78,7 +51,8 @@ export default function CartDrawer({ onClose, onSelectBook, onViewOrders }) {
               <p className="font-sans text-[12px] text-cream-400">{cartCount} {cartCount === 1 ? 'item' : 'items'}</p>
               <p className="font-display text-[28px] leading-none text-cream-100">{money(cartTotal)}</p>
             </div>
-            <button type="button" onClick={checkout} className={cx(btnBrass, 'h-[42px] w-full text-[13px]', ring)}>Place order</button>
+            <button type="button" onClick={onCheckout} className={cx(btnBrass, 'h-[42px] w-full text-[13px]', ring)}>Proceed to Checkout</button>
+            <p className="text-center font-sans text-[10px] text-cream-400">5% GST is added at checkout. Shipping is free.</p>
             <button type="button" onClick={clearCart} className={cx(btnGhost, 'h-[34px] w-full', ring)}>Clear cart</button>
           </div>
         </>

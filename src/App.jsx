@@ -5,6 +5,7 @@ import BookSpreadModal from './components/BookSpreadModal.jsx'
 import AuthModal from './components/AuthModal.jsx'
 import WishlistDrawer from './components/WishlistDrawer.jsx'
 import CartDrawer from './components/CartDrawer.jsx'
+import CheckoutModal from './components/CheckoutModal.jsx'
 import OrdersModal from './components/OrdersModal.jsx'
 import SearchPanel from './components/SearchPanel.jsx'
 import { AboutModal, ContactModal } from './components/InfoModal.jsx'
@@ -13,7 +14,7 @@ import { genres } from './data/books.js'
 
 function Store() {
   const { cartCount, wishlist, addToCart, toggleWishlist, user, logout, announcement } = useStore()
-  const [panel, setPanel] = useState(null) // search | wishlist | cart | about | contact | login | orders
+  const [panel, setPanel] = useState(null) // search | wishlist | cart | checkout | about | contact | login | orders
   const [book, setBook] = useState(null)
 
   const openPanel = useCallback((name) => () => setPanel(name), [])
@@ -56,7 +57,8 @@ function Store() {
       <AnimatePresence>
         {panel === 'search' && <SearchPanel key="search" onClose={closePanel} onSelectBook={selectBook} />}
         {panel === 'wishlist' && <WishlistDrawer key="wishlist" onClose={closePanel} onSelectBook={selectBook} />}
-        {panel === 'cart' && <CartDrawer key="cart" onClose={closePanel} onSelectBook={selectBook} onViewOrders={openPanel('orders')} />}
+        {panel === 'cart' && <CartDrawer key="cart" onClose={closePanel} onSelectBook={selectBook} onCheckout={openPanel('checkout')} />}
+        {panel === 'checkout' && <CheckoutModal key="checkout" onClose={closePanel} onViewOrders={openPanel('orders')} />}
         {panel === 'about' && <AboutModal key="about" onClose={closePanel} />}
         {panel === 'contact' && <ContactModal key="contact" onClose={closePanel} />}
         {panel === 'login' && <AuthModal key="login" onClose={closePanel} />}

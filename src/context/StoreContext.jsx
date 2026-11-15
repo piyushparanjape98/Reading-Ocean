@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { booksById } from '../data/books.js'
+import { breakdown, newOrderId } from '../lib/checkout.js'
 
 /* ────────────────────────────────────────────────────────────────────────────
    Reading Ocean · store state
@@ -142,6 +143,8 @@ export function StoreProvider({ children }) {
 
   /* ── orders ── */
   const owner = user?.email || 'guest'
+  // draft: { items: [{ book, quantity }], customer: { name, email, phone, address }, payment: { method, detail } }
+  // Card numbers, CVVs and UPI PINs are never passed in here: `payment.detail` is only a label such as "•••• 4242".
   const addOrder = useCallback(
     (draft) => {
       const items = draft.items.map(({ book, quantity }) => ({
@@ -151,18 +154,21 @@ export function StoreProvider({ children }) {
         price: book.price, // price at the time of purchase
         quantity,
       }))
+      const placed = new Date()
       const order = {
-        id: `RO-${Date.now().toString(36).toUpperCase()}`,
-        placedAt: new Date().toISOString(),
+        id: newOrderId(orders.map((o) => o.id), placed),
+        placedAt: placed.toISOString(),
         owner,
         items,
-        total: items.reduce((sum, i) => sum + i.price * i.quantity, 0),
+        ...breakdown(items),
+        customer: draft.customer ?? null,
+        payment: draft.payment ?? null,
       }
       setOrders((o) => [order, ...o])
       announce(`Order ${order.id} placed`)
       return order
     },
-    [owner, announce],
+    [owner, orders, announce],
   )
 
   const value = useMemo(() => {
