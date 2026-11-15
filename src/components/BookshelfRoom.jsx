@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import AccountMenu from './AccountMenu.jsx'
 
 /* ────────────────────────────────────────────────────────────────────────────
    Reading Ocean · the room
@@ -61,7 +62,7 @@ const CartIcon = () => (
 
 /* ───────────────────────────── nav ───────────────────────────── */
 
-function NavBar({ compact, cartCount, wishlistCount }) {
+function NavBar({ compact, cartCount, wishlistCount, nav = {} }) {
   const iconBtn = cx(
     'relative grid h-10 place-items-center rounded-sm text-cream-200 transition-colors hover:text-brass-300',
     compact ? 'w-9' : 'w-10',
@@ -76,8 +77,8 @@ function NavBar({ compact, cartCount, wishlistCount }) {
       )}
     >
       <nav aria-label="Primary" className={cx('flex items-center text-cream-200', compact ? 'gap-[17px] text-[12px]' : 'gap-[31px] text-[13px]')}>
-        <a href="#about" className={cx('rounded-sm transition-colors hover:text-brass-300', ring)}>About</a>
-        <a href="#contact" className={cx('rounded-sm transition-colors hover:text-brass-300', ring)}>Contact</a>
+        <button type="button" onClick={nav.onAbout} className={cx('rounded-sm transition-colors hover:text-brass-300', ring)}>About</button>
+        <button type="button" onClick={nav.onContact} className={cx('rounded-sm transition-colors hover:text-brass-300', ring)}>Contact</button>
       </nav>
 
       {!compact && (
@@ -87,11 +88,11 @@ function NavBar({ compact, cartCount, wishlistCount }) {
       )}
 
       <div className="flex items-center gap-[2px]">
-        <button type="button" className={iconBtn} aria-label="Search"><SearchIcon /></button>
-        <button type="button" className={iconBtn} aria-label={`Wishlist, ${wishlistCount} saved`}>
+        <button type="button" onClick={nav.onSearch} className={iconBtn} aria-label="Search"><SearchIcon /></button>
+        <button type="button" onClick={nav.onWishlist} className={iconBtn} aria-label={`Wishlist, ${wishlistCount} saved`}>
           <HeartIcon filled={wishlistCount > 0} />
         </button>
-        <button type="button" className={iconBtn} aria-label={`Cart, ${cartCount} items`}>
+        <button type="button" onClick={nav.onCart} className={iconBtn} aria-label={`Cart, ${cartCount} items`}>
           <CartIcon />
           <motion.span
             key={cartCount}
@@ -103,10 +104,12 @@ function NavBar({ compact, cartCount, wishlistCount }) {
             {cartCount}
           </motion.span>
         </button>
-        {compact ? (
-          <a href="#login" className={cx('ml-3 rounded-sm text-[11px] text-cream-200 transition-colors hover:text-brass-300', ring)}>Login</a>
+        {nav.user ? (
+          <AccountMenu user={nav.user} compact={compact} onOrders={nav.onOrders} onLogout={nav.onLogout} />
+        ) : compact ? (
+          <button type="button" onClick={nav.onLogin} className={cx('ml-3 rounded-sm text-[11px] text-cream-200 transition-colors hover:text-brass-300', ring)}>Login</button>
         ) : (
-          <a href="#login" className={cx('ml-5 grid h-[34px] w-[76px] place-items-center rounded-[2px] bg-brass-200 text-[12px] text-[#332b23] transition-colors hover:bg-[#efe0c4]', ring)}>Login</a>
+          <button type="button" onClick={nav.onLogin} className={cx('ml-5 grid h-[34px] w-[76px] place-items-center rounded-[2px] bg-brass-200 text-[12px] text-[#332b23] transition-colors hover:bg-[#efe0c4]', ring)}>Login</button>
         )}
       </div>
     </header>
@@ -806,6 +809,7 @@ export default function BookshelfRoom({
   onToggleWishlist,
   onSelectBook,
   escapeDisabled = false,
+  nav,
 }) {
   const vp = useViewport()
   const reduce = useReducedMotion()
@@ -862,7 +866,7 @@ export default function BookshelfRoom({
       ) : (
         <DesktopRoom vp={vp} openId={openId} active={active} setActive={setActive} onOpen={openGenre} close={close} closeRef={closeRef} origin={origin} reduce={reduce} {...shared} />
       )}
-      {!(mobile && genre) && <NavBar compact={mobile} cartCount={cartCount} wishlistCount={wishlist.size} />}
+      {!(mobile && genre) && <NavBar compact={mobile} cartCount={cartCount} wishlistCount={wishlist.size} nav={nav} />}
     </>
   )
 }

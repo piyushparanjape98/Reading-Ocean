@@ -292,3 +292,5 @@ genres.forEach((g) =>
 )
 
 export const allBooks = genres.flatMap((g) => g.books)
+
+export const booksById = Object.fromEntries(allBooks.map((b) => [b.id, b]))
